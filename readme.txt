@@ -10,7 +10,7 @@ Prep:
     php test_<projectname>.php
   
 Process:
-  1. php process.php <projectname>
+  1. php processor.php <projectname>
   2. php postprocess.php <projectname> <comma-separated list of exts> //eg pdf,m4v
   3. sh zipall.sh <projectname>/work
   4. upload all zips to scholarsbank server and ingest
