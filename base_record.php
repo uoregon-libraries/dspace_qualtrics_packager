@@ -39,8 +39,8 @@ class BaseRecord{
   
   //default: separate fields for author first and last name
   public function construct_dirname(){
-    $last = str_replace([" ", "'"], "", trim($this->author['ind']['last']));
-    $first = str_replace([" ", "'"], "", trim($this->author['ind']['first']));
+    $last = str_replace([" ", "'"], "", trim($this->author['ind']->last));
+    $first = str_replace([" ", "'"], "", trim($this->author['ind']->first));
     return $last . "_" . $first;
   }
   
