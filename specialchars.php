@@ -9,7 +9,7 @@ class SpecialChars{
   
   function html_convert_entities($string) {
     return preg_replace_callback('/&([a-zA-Z][a-zA-Z0-9]+);/S',
-                               'convert_entity', $string);
+                               array(get_class($this),'convert_entity'), $string);
   }
 
 /* Swap HTML named entity with its numeric equivalent. If the entity
