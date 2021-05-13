@@ -1,5 +1,7 @@
 Prep:
   1. metadata file
+    download the csv if possible
+    remove tabs, remove CRs except for the actual end of the records/lines
     convert the metadata into a tab-separated file containing the required fields
     save this file here: <projectname>/data.csv
   2. content files
