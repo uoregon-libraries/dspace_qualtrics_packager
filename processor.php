@@ -45,7 +45,8 @@
 
   function copy_content_file($record, $recordpath){
     $newfilename = str_replace(" ", "_", $record->filename['val']);
-    copy($GLOBALS['filepath'] . $record->filename['val'], $recordpath . $newfilename);
+    $oldfilename = str_replace(" ", "%20", $record->filename['val']);
+    copy($GLOBALS['filepath'] . $oldfilename, $recordpath . $newfilename);
   }
 
   process_everything();
