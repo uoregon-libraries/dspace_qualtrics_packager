@@ -12,17 +12,20 @@ class BaseRecord{
   public $dc_formatter;
   public $char_handler;
   public $rights;
-  
+  public $permission;
+
   public function init($project_type){
     $this->project_type = $project_type;
     $this->dc_formatter = new DublinCoreXML();
     $this->char_handler = new SpecialChars();
   }
-  
+
+  //it is not necessary to set the val for any field that has a val assigned in the config
   public function set_metadata($string){
     $arr = explode("\t", $string);
+    if (trim($arr[$this->permission['ind']]) != 'Yes')
+      throw new Exception("Permission to publish is not granted.");
     $this->title['val'] = $this->char_handler->clean($arr[$this->title['ind']]);
-    $this->author['val'] = $this->construct_author($arr);
     $this->subjects['val'] = $this->construct_subjects($arr);
     return $arr;
   }
