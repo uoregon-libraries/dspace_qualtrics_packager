@@ -51,7 +51,21 @@ class BaseRecord{
     }
     return $subjects;
   }
-  
+
+  //for now, there is only a 2Y embargo offered.
+  public function construct_embargo($arr){
+    if($arr[$this->embargo['ind']]=='Yes')
+      return $this->add2Y();
+    else return "";
+  }
+
+  public function add2Y(){
+    $d = new DateTime();
+    $diff = new DateInterval('P2Y');
+    $d2 = $d->add($diff);
+    return $d2->format('Y-m-d');
+  }
+
   //will add empty string if there is no value for a given field
   public function assemble_properties(){
     $string = $this->dc_formatter->title($this->title['val']);
