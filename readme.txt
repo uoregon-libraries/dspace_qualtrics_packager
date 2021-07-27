@@ -10,6 +10,9 @@ Prep:
     confirm that fields, indices, static values are all correct.
   4. optional test:
     php test_<projectname>.php
+  5. placement of a permission field at the end of each record has an added benefit:
+    if any of the content contains either a tab or newline, the permission field for that
+    record will not be reachable, and the record will not be processed.
   
 Process:
   1. php processor.php <projectname>
