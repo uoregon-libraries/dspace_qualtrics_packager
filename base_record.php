@@ -51,7 +51,15 @@ class BaseRecord{
     }
     return $subjects;
   }
-  
+
+
+  public function add2Y(){
+    $d = new DateTime();
+    $diff = new DateInterval('P2Y');
+    $d2 = $d->add($diff);
+    return $d2->format('Y-m-d');
+  }
+
   //will add empty string if there is no value for a given field
   public function assemble_properties(){
     $string = $this->dc_formatter->title($this->title['val']);

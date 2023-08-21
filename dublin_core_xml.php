@@ -120,6 +120,12 @@
     return "";
   }
 
+  function embargo($date){
+    if($date != "")
+      return '<dcvalue element="description" qualifier="embargo" language="en_US">' . $date . '</dcvalue>';
+    return "";
+  }
+
   function begin_xml(){
     return '<?xml version="1.0" ?><dublin_core schema="dc">';
   }

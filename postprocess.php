@@ -1,8 +1,8 @@
 <?php
 // call this with the projectname and a list of extensions separated by commas, eg:
 // php postprocess.php urs pdf,mp4
-// Possible future todo: will need to screen out the metadata file if the users include xml files in their uploads.
-
+// Note: will need to screen out dublin_core.xml if the users include xml files in their uploads.
+// 2023 tried to make this to work with new chc workflow, in which the content files are added manually. This can be reverted once the chc input stage is not interrupted by manual file editing.
 $APPDIR = getcwd();
 $PROJPATH = "{$APPDIR}/{$argv[1]}";
 $WORKDIR = "{$PROJPATH}/work";
@@ -21,10 +21,13 @@ function write_list($dirpath, $types){
   fwrite($fp, $string);
   fclose($fp);
 }
-if(sizeof($argv) != 3)
-  exit("wrong number of args");
 
-$types = explode(",", $argv[2]);
+// processing starts here. Modified to enable no content file
+if(sizeof($argv) > 2)
+  $types = explode(",", $argv[2]);
+else
+  $types = [];
+
 $iterator = new DirectoryIterator($WORKDIR);
 foreach($iterator as $dir){
   if($dir->isDot()) continue;

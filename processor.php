@@ -1,6 +1,7 @@
 <?php
 
   $projname = $argv[1];
+  $datafile = $argv[2];
 
   include "base_record.php";
   include "specialchars.php";
@@ -13,7 +14,7 @@
   $filepath = "{$projpath}/files/";
 
   function process_everything(){
-    $lines = File("{$GLOBALS['projpath']}data.csv");
+    $lines = File("{$GLOBALS['projpath']}{$GLOBALS['datafile']}");
     foreach($lines as $line){
       try{
         $record = create_record($line);
@@ -50,8 +51,10 @@
     fwrite($fp, $content);
     fclose($fp);
   }
-
+  // 2023 this may need tweaking
   function copy_content_file($record, $recordpath){
+    if(property_exists($record, "filename")===false)
+      return;
     $newfilename = str_replace(" ", "_", $record->filename['val']);
     copy($GLOBALS['filepath'] . $record->filename['val'], $recordpath . $newfilename);
   }
