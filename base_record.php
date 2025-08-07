@@ -13,6 +13,7 @@ class BaseRecord{
   public $char_handler;
   public $rights;
   public $permission;
+  public $row_end;
 
   public function init($project_type){
     $this->project_type = $project_type;
@@ -23,8 +24,12 @@ class BaseRecord{
   //it is not necessary to set the val for any field that has a val assigned in the config
   public function set_metadata($string){
     $arr = explode("\t", $string);
-    if (trim($arr[$this->permission['ind']]) != 'Yes')
+    if($arr[$this->row_end['ind'] != $arr[0])
+      throw new Exception("Incorrect number of columns, check for extra tabs.");
+    if($this->permission_granted($arr) == false)
       throw new Exception("Permission to publish is not granted.");
+    if($this->materials_unavailable($arr) == true)
+      throw new Exception("Document not yet available");
     $this->title['val'] = $this->char_handler->clean($arr[$this->title['ind']]);
     $this->subjects['val'] = $this->construct_subjects($arr);
     return $arr;

@@ -12,8 +12,10 @@
   $projpath = "{$curdir}/{$projname}/";
   $workpath = "{$projpath}work/";
   $filepath = "{$projpath}/files/";
+  $abstracts;
 
   function process_everything(){
+    //load_abstracts();
     $lines = File("{$GLOBALS['projpath']}{$GLOBALS['datafile']}");
     foreach($lines as $line){
       try{
@@ -53,11 +55,21 @@
   }
   // 2023 this may need tweaking
   function copy_content_file($record, $recordpath){
-    if(property_exists($record, "filename")===false)
+    if(!isset($record->filename))
       return;
     $newfilename = str_replace(" ", "_", $record->filename['val']);
     copy($GLOBALS['filepath'] . $record->filename['val'], $recordpath . $newfilename);
   }
+
+    //adding this to deal with separate abstracts source 2024
+    function load_abstracts(){
+      $GLOBALS['abstracts'] = [];
+      $lines = File("{$GLOBALS['projpath']}abstracts.csv");
+      foreach($lines as $line){
+        $arr = explode("\t", $line);
+        $GLOBALS['abstracts'][$arr[0]] = $arr[1];
+      }
+    }
 
   process_everything();
 ?>
