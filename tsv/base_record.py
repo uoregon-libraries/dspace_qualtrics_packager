@@ -117,7 +117,7 @@ class BaseRecord:
         self.authors = {}
         self.subjects = {}
         self.issued = {}
-        self.filename = None
+        self.filename = {}
         self.type = {}
         self.publisher = {}
         self.rights = {}
@@ -125,7 +125,7 @@ class BaseRecord:
         # These fields are not declared in the PHP class but are used,
         # likely populated from the config file.
         self.description = {}
-        self.pages = {}
+        self.page_count = {}
         self.lang = {}
         self.abstract = {}
         
@@ -144,8 +144,9 @@ class BaseRecord:
         Returns the parsed array.
         """
         arr = tsv_string.split("\t")
-        if arr[self.permission['ind']].strip().lower() != 'yes':
-            raise Exception("Permission to publish is not granted.")
+        # todo: move this check to full record
+        #if arr[self.permission['ind']].strip().lower() != 'yes':
+        #    raise Exception("Permission to publish is not granted.")
         
         self.title['val'] = self.char_handler.clean(arr[self.title['ind']])
         self.subjects['val'] = self.construct_subjects(arr)

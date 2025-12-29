@@ -1,13 +1,17 @@
 import sys
 import os
 import shutil
-from chc.full_record import FullRecord
+def get_full_record_class(projname):
+    """Dynamically imports the FullRecord class from the project's module."""
+    try:
+        module = __import__(f"{projname}.full_record", fromlist=['FullRecord'])
+        return module.FullRecord
+    except ImportError as e:
+        print(f"Error: Could not import FullRecord for project '{projname}'.")
+        raise e
 
-def create_record(line: str, projname: str) -> FullRecord:
+def create_record(line: str, projname: str, FullRecord) -> 'FullRecord':
     """Creates and initializes a FullRecord object."""
-    if projname != 'chc':
-        raise ValueError(f"This processor is currently configured only for the 'chc' project.")
-    
     record = FullRecord()
     record.init(projname)
     record.get_configs()
@@ -23,28 +27,40 @@ def create_dir(dirname: str, workpath: str) -> str:
     os.makedirs(recorddir)
     return recorddir + os.path.sep
 
-def write_xml(record: FullRecord, recordpath: str):
+def write_xml(record, recordpath: str):
     """Writes the Dublin Core XML file."""
     content = record.assemble_properties()
     xml_filepath = os.path.join(recordpath, "dublin_core.xml")
     with open(xml_filepath, 'w', encoding='utf-8') as f:
         f.write(content)
 
-def copy_content_file(record: FullRecord, recordpath: str, filepath: str):
+def write_contents(record, recordpath: str):
+    """Writes the contents file"""
+    fpath = os.path.join(recordpath, "contents")
+    with open(fpath, 'w', encoding='utf-8') as f:
+      f.write(f"{record.filename['val']}\tbundle:ORIGINAL\n")
+      f.write("license.txt\tbundle:LICENSE\n")
+
+def copy_license(recordpath: str):
+    curdir = os.getcwd()
+    license_path = os.path.join(curdir, "license.txt")
+    dest_path = os.path.join(recordpath, "license.txt")
+    shutil.copy(license_path, dest_path)
+
+def copy_content_file(record, recordpath: str, filepath: str):
     """Copies the content file associated with the record."""
-    if hasattr(record, 'filename') and record.filename and 'val' in record.filename and record.filename['val']:
-        original_filename = record.filename['val']
-        new_filename = original_filename.replace(" ", "_")
-        
-        source_path = os.path.join(filepath, original_filename)
-        dest_path = os.path.join(recordpath, new_filename)
-        
+    try:
+        filename = record.filename['val']
+        source_path = os.path.join(filepath, filename)
+        dest_path = os.path.join(recordpath, filename)
         if os.path.exists(source_path):
             shutil.copy(source_path, dest_path)
         else:
             print(f"Warning: Content file not found at {source_path}")
+    except AttributeError:
+        print(f"Warning: Content file not found at {source_path}")
 
-def process_everything(projname: str, datafile: str):
+def process_everything(projname: str, datafile: str, FullRecord):
     """Processes all lines in the data file."""
     curdir = os.getcwd()
     projpath = os.path.join(curdir, projname)
@@ -54,7 +70,6 @@ def process_everything(projname: str, datafile: str):
     os.makedirs(workpath, exist_ok=True)
     
     data_file_path = os.path.join(projpath, datafile)
-    
     try:
         with open(data_file_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -62,10 +77,12 @@ def process_everything(projname: str, datafile: str):
                 if not line:
                     continue
                 try:
-                    record = create_record(line, projname)
-                    record_dir_path = create_dir(record.construct_dirname(), workpath)
+                    record = create_record(line, projname, FullRecord)
+                    record_dir_path = create_dir(record.dirname['val'], workpath)
                     write_xml(record, record_dir_path)
                     copy_content_file(record, record_dir_path, filepath)
+                    copy_license(record_dir_path)
+                    write_contents(record, record_dir_path)
                 except Exception as e:
                     print(f"Error processing record: {e}\nRecord data: {line[:100]}...")
 
@@ -81,8 +98,9 @@ def main():
     
     projname = sys.argv[1]
     datafile = sys.argv[2]
-    
-    process_everything(projname, datafile)
+    FullRecord = get_full_record_class(projname)
+
+    process_everything(projname, datafile, FullRecord)
 
 if __name__ == "__main__":
     main()
