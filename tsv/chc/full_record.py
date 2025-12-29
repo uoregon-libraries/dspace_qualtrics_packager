@@ -7,13 +7,20 @@ class FullRecord(BaseRecord):
         self.advisors = {}
         self.orcid = {}
         self.embargo = {}
+        self.dirname = {}
+        self.email = {}
 
     def set_metadata(self, tsv_string: str) -> list[str]:
         arr = super().set_metadata(tsv_string)
         self.authors['val'] = self.construct_authors(arr)
         self.advisors['val'] = self.construct_advisors(arr)
         self.abstract['val'] = self.char_handler.clean(arr[self.abstract['ind']])
-        self.description['val'] = ""
+        self.description['val'] = arr[self.page_count['ind']] + " pages."
+        self.issued['val'] = self.issued.get('val')
+        self.email['val'] = arr[self.email['ind']]
+        self.filename['val'] = self.construct_filename()
+        self.dirname['val'] = self.construct_dirname()
+
         # Check if orcid index exists and is within bounds
         if 'ind' in self.orcid and self.orcid['ind'] < len(arr):
             self.orcid['val'] = arr[self.orcid['ind']]
@@ -30,9 +37,14 @@ class FullRecord(BaseRecord):
         return arr
 
     def construct_dirname(self) -> str:
-        if not self.authors.get('val'):
+        if not self.email.get('val'):
             return ""
-        return self.authors['val'][0].replace(" ", "").replace("'", "").replace(",", "")
+        return self.email['val'].replace("@uoregon.edu", "")
+
+    def construct_filename(self) -> str:
+        if not self.email.get('val'):
+            return ""
+        return self.email['val'].replace("@uoregon.edu", "_thesis.pdf")
 
     def construct_authors(self, arr: list[str]) -> list[str]:
         authors = []
